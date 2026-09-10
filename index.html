@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TachographReader — Digital Tachograph (.DDD) Compliance Tool</title>
+  <meta name="description" content="Free, 100% GDPR-compliant client-side digital tachograph (.DDD) driver card review and audit compliance tool. Zero data retention, zero telemetry.">
+  <meta name="keywords" content="tachograph reader, ddd reader, digital tachograph, driver compliance, transport manager, ddd parser">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 6v6l4 2'/%3E%3C/svg%3E">
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Screen Layout -->
+  <div class="app-container no-print">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <!-- App Branding -->
+      <div class="brand">
+        <svg class="brand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 6v6l4 2"></path>
+        </svg>
+        <div>
+          <h1>TachographReader</h1>
+          <span class="brand-subtitle">Driver Compliance Review Tool</span>
+        </div>
+      </div>
+
+      <!-- File Upload Control -->
+      <section class="sidebar-section">
+        <h2 class="section-title">Upload DDD File</h2>
+        <div class="upload-zone" id="upload-zone">
+          <input type="file" id="file-input" accept=".ddd,.DDD,application/octet-stream" style="display: none;">
+          <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+          <p class="upload-text">Drag & drop a <strong>.DDD</strong> file here</p>
+          <p class="upload-subtext">or click to browse your computer</p>
+        </div>
+
+      </section>      <!-- Company Fleet Settings -->
+      <section class="sidebar-section">
+        <h2 class="section-title">Company Fleet List</h2>
+        <div style="background-color: var(--card-bg); border: 1px solid var(--border-color); padding: 1rem; border-radius: var(--radius-md);">
+          <label for="fleet-registrations-input" style="display: block; margin-bottom: 0.5rem; color: #94a3b8; font-weight: 500; font-size: 0.75rem;">Default Fleet Registrations</label>
+          <textarea id="fleet-registrations-input" class="form-control" rows="2" placeholder="e.g. GN26UVY, GN26UVZ, DA71SPX" style="background-color: #ffffff; color: var(--text-main); border-color: var(--border-color); font-size: 0.8rem; font-family: monospace; resize: vertical; min-height: 50px; outline: none; border-radius: var(--radius-sm);"></textarea>
+          <p class="text-muted" style="font-size: 0.7rem; margin-top: 0.4rem; line-height: 1.2;">Vehicles entered here will be auto-selected upon parsing. All others will be unchecked by default.</p>
+        </div>
+      </section>
+
+      <!-- Privacy Notice (GDPR compliance) -->
+      <section class="sidebar-section privacy-notice-section flex-grow">
+        <h2 class="section-title">Privacy & GDPR Notice</h2>
+        <div class="privacy-notice-card">
+          <svg class="privacy-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <p><strong>Zero Data Storage</strong></p>
+          <p class="privacy-notice-text">
+            To ensure full compliance with GDPR regulations, this application operates <strong>entirely in-memory</strong>. 
+          </p>
+          <p class="privacy-notice-text">
+            No driver data, logs, or comments are saved to disk, stored in browser cookies, or transmitted over the network. Hitting refresh or closing this tab completely clears all inputs.
+          </p>
+        </div>
+      </section>
+      
+      <!-- Footer Info -->
+      <div class="sidebar-footer">
+        <p>Standalone App v1.0.0</p>
+        <p>No internet connection required</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Actions / Header Status -->
+      <header class="main-header">
+        <div class="header-left">
+          <h2 id="current-driver-title">No Driver File Loaded</h2>
+          <p class="text-muted" id="current-file-subtitle">Please upload a .DDD tachograph file to begin the compliance review.</p>
+        </div>
+        <div class="header-actions">
+          <button id="btn-reset" class="btn btn-outline" disabled>Clear Current</button>
+          <button id="btn-print" class="btn btn-primary" disabled>
+            <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Print Acknowledgement
+          </button>
+        </div>
+      </header>
+
+      <!-- Welcome screen when no driver is loaded -->
+      <div class="welcome-screen" id="welcome-screen">
+        <div class="welcome-card">
+          <div class="welcome-icon-circle">
+            <svg class="welcome-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h3>Quick Driver Tachograph Review</h3>
+          <p>This standalone tool allows transport managers to review digital tachograph card exports, identify alerts/infringements, make comments, and print driver sign-off sheets.</p>
+          
+          <div class="welcome-steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div>
+                <strong>Select or Drag a DDD file</strong>
+                <p>Upload a driver card file from your depot storage.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div>
+                <strong>Review infringements & add notes</strong>
+                <p>The system lists driving limits, rest periods, and card errors.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div>
+                <strong>Print and Sign</strong>
+                <p>Generate a professional print form for the driver to sign for audit proof.</p>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+      <!-- Dashboard View (hidden initially) -->
+      <div class="dashboard-grid hidden" id="dashboard-view">
+        
+        <!-- Summary Cards Row -->
+        <section class="summary-cards">
+          <!-- Compliance Score -->
+          <div class="card stat-card compliance-card">
+            <div class="stat-content">
+              <span class="stat-label">Compliance Score</span>
+              <span class="stat-value" id="compliance-score">--</span>
+              <span class="stat-desc">Based on severity weights</span>
+            </div>
+            <div class="compliance-ring-container">
+              <svg viewBox="0 0 36 36" class="circular-chart">
+                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path id="compliance-circle" class="circle" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- High Severity -->
+          <div class="card stat-card border-high">
+            <div class="stat-content">
+              <span class="stat-label">High Severity Alerts</span>
+              <span class="stat-value text-high" id="count-high">0</span>
+              <span class="stat-desc">Requires immediate action</span>
+            </div>
+            <div class="stat-icon-bg bg-high-light">
+              <svg class="stat-icon text-high" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- Medium Severity -->
+          <div class="card stat-card border-medium">
+            <div class="stat-content">
+              <span class="stat-label">Medium Severity Alerts</span>
+              <span class="stat-value text-medium" id="count-medium">0</span>
+              <span class="stat-desc">Should be reviewed & notes added</span>
+            </div>
+            <div class="stat-icon-bg bg-medium-light">
+              <svg class="stat-icon text-medium" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- Low Severity -->
+          <div class="card stat-card border-low">
+            <div class="stat-content">
+              <span class="stat-label">Low Severity Alerts</span>
+              <span class="stat-value text-low" id="count-low">0</span>
+              <span class="stat-desc">Minor discrepancies / missing records</span>
+            </div>
+            <div class="stat-icon-bg bg-low-light">
+              <svg class="stat-icon text-low" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+        </section>
+
+        <!-- Driver Info Panel -->
+        <section class="card driver-info-card">
+          <div class="card-header">
+            <h3>Driver Details</h3>
+            <span class="badge badge-primary" id="driver-status-badge">Loaded</span>
+          </div>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Driver Name</span>
+              <strong class="info-val" id="driver-name">--</strong>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Driver Card Number</span>
+              <strong class="info-val font-mono" id="driver-card">--</strong>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Vehicles Recorded</span>
+              <strong class="info-val" id="vehicle-reg">--</strong>
+            </div>
+            <div class="info-item">
+              <label for="reporting-period-select" class="info-label" style="color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 0.25rem;">Reporting Period Scope</label>
+              <select id="reporting-period-select" class="form-control form-control-sm" style="background-color: #ffffff; color: var(--text-main); border-color: var(--border-color); font-weight: 500; padding: 0.35rem 0.5rem; outline: none; border-radius: var(--radius-sm);">
+                <option value="30">Last 30 Days (1 Month)</option>
+                <option value="60">Last 60 Days (2 Months)</option>
+                <option value="90">Last 90 Days (3 Months)</option>
+                <option value="180">Last 180 Days (6 Months)</option>
+                <option value="custom">Custom Date Range...</option>
+              </select>
+            </div>
+            <div class="info-item hidden" id="custom-date-container">
+              <span class="info-label" style="display: block; margin-bottom: 0.25rem;">Custom Date Range</span>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <input type="date" id="custom-start-date" class="form-control form-control-sm" style="background-color: #ffffff; color: var(--text-main); border-color: var(--border-color); padding: 0.25rem 0.5rem; outline: none; border-radius: var(--radius-sm);">
+                <span style="font-size: 0.8rem; color: var(--text-muted);">to</span>
+                <input type="date" id="custom-end-date" class="form-control form-control-sm" style="background-color: #ffffff; color: var(--text-main); border-color: var(--border-color); padding: 0.25rem 0.5rem; outline: none; border-radius: var(--radius-sm);">
+              </div>
+            </div>
+            <div class="info-item full-width">
+              <span class="info-label">Source File</span>
+              <span class="info-val text-muted font-mono" style="font-size: 0.85rem;" id="source-filename">--</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Company Vehicle Scope Card -->
+        <section class="card vehicle-filter-card" id="vehicle-filter-card">
+          <div class="card-header">
+            <h3>Company Vehicle Filter</h3>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <button type="button" id="btn-vehicle-select-all" class="btn btn-outline" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; height: auto;">Select All</button>
+              <button type="button" id="btn-vehicle-deselect-all" class="btn btn-outline" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; height: auto;">Deselect All</button>
+              <span class="badge badge-primary" id="vehicle-filter-badge">0 / 0 Selected</span>
+            </div>
+          </div>
+          <p class="text-muted subtitle" style="margin-bottom: 1rem;">Select the vehicles operated by your company. Unchecked vehicles and their infringements will be hidden from the active review and printed form.</p>
+          <div class="vehicle-checkbox-grid" id="vehicle-checkbox-grid">
+            <!-- Populated dynamically by JS -->
+          </div>
+        </section>
+
+        <!-- Alerts Table Panel -->
+        <section class="card alerts-card">
+          <div class="card-header">
+            <h3>Alerts & Infringements</h3>
+            <span class="badge badge-neutral" id="total-alerts-badge">0 Alerts</span>
+          </div>
+          <div class="table-container">
+            <table class="alerts-table">
+              <thead>
+                <tr>
+                  <th style="width: 120px;">Date</th>
+                  <th style="width: 100px;">Severity</th>
+                  <th style="width: 120px;">Vehicle</th>
+                  <th style="width: 180px;">Alert Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody id="alerts-table-body">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Manager Review Form Panel -->
+        <section class="card review-form-card">
+          <div class="card-header">
+            <h3>Manager Compliance Review</h3>
+            <p class="subtitle text-muted">Complete notes and corrective actions before saving or printing.</p>
+          </div>
+          <form id="review-form" class="review-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="manager-name" class="control-label">Manager Name <span class="required">*</span></label>
+                <input type="text" id="manager-name" class="form-control" placeholder="e.g., Jane Miller (Transport Manager)" required>
+              </div>
+              <div class="form-group">
+                <label for="review-date" class="control-label">Review Date <span class="required">*</span></label>
+                <input type="date" id="review-date" class="form-control" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="manager-notes" class="control-label">Manager Notes / Findings</label>
+              <textarea id="manager-notes" class="form-control" rows="3" placeholder="Describe findings, explain why driving limits were exceeded or rest periods missed, and reference specific driving records."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="corrective-actions" class="control-label">Corrective Actions / Training Plan</label>
+              <textarea id="corrective-actions" class="form-control" rows="3" placeholder="Detail any training given (e.g. EU drivers' hours regulations review), warnings issued, or operational actions."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="driver-comments" class="control-label">Driver Comments (if any)</label>
+              <textarea id="driver-comments" class="form-control" rows="2" placeholder="Driver's response or explanations."></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" id="btn-quick-print" class="btn btn-primary">
+                <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                Print Review
+              </button>
+            </div>
+          </form>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- PRINT ONLY SECTION: Styled specifically for A4 paper printing -->
+  <div class="print-document visible-print-only" id="print-document">
+    <!-- Header -->
+    <div class="print-header">
+      <div class="print-title-area">
+        <h1>TACHOGRAPH DRIVER REVIEW</h1>
+        <p class="print-subtitle">Compliance Acknowledgement & Action Plan</p>
+      </div>
+      <div class="print-metadata">
+        <p><strong>Review Date:</strong> <span id="p-review-date">--</span></p>
+        <p><strong>Manager:</strong> <span id="p-manager-name">--</span></p>
+      </div>
+    </div>
+
+    <!-- Driver & Vehicle Table -->
+    <div class="print-section-title">1. DRIVER & VEHICLE DETAILS</div>
+    <table class="print-table-info">
+      <tr>
+        <th>Driver Name:</th>
+        <td id="p-driver-name">--</td>
+        <th>Driver Card Number:</th>
+        <td id="p-driver-card" class="font-mono">--</td>
+      </tr>
+      <tr>
+        <th>Vehicles Reviewed:</th>
+        <td id="p-vehicle-reg">--</td>
+        <th>Reporting Period:</th>
+        <td id="p-report-period">--</td>
+      </tr>
+      <tr>
+        <th>Source File:</th>
+        <td colspan="3" id="p-source-filename" class="font-mono">--</td>
+      </tr>
+    </table>
+
+    <!-- Infringement Summary -->
+    <div class="print-section-title">2. INFRINGEMENTS & ALERTS REGISTERED</div>
+    <table class="print-table-alerts">
+      <thead>
+        <tr>
+          <th style="width: 100px;">Date</th>
+          <th style="width: 80px;">Severity</th>
+          <th style="width: 100px;">Vehicle</th>
+          <th style="width: 180px;">Alert Type</th>
+          <th>Description / Infringement Details</th>
+        </tr>
+      </thead>
+      <tbody id="print-alerts-body">
+        <!-- Populated by JS -->
+      </tbody>
+    </table>
+
+    <!-- Notes & Actions -->
+    <div class="print-section-title">3. MANAGEMENT REVIEW & CORRECTIVE ACTIONS</div>
+    
+    <div class="print-notes-box">
+      <strong>Manager Findings & Notes:</strong>
+      <p id="p-manager-notes" class="print-text-block">--</p>
+    </div>
+
+    <div class="print-notes-box">
+      <strong>Corrective Actions & Training Required:</strong>
+      <p id="p-corrective-actions" class="print-text-block">--</p>
+    </div>
+
+    <div class="print-notes-box">
+      <strong>Driver Comments:</strong>
+      <p id="p-driver-comments" class="print-text-block">--</p>
+    </div>
+
+    <!-- Acknowledgment statement -->
+    <div class="print-acknowledgement">
+      <div class="print-section-title" style="margin-top: 0;">4. DECLARATION & ACKNOWLEDGEMENT</div>
+      <p class="declaration-text">
+        I acknowledge that the alerts and infringements listed above have been explained to me by management and I understand the corrective actions required.
+      </p>
+      
+      <div class="signature-grid">
+        <div class="sig-block">
+          <div class="sig-line"></div>
+          <div class="sig-label">Driver Signature</div>
+          <div class="sig-date-line">Date: __________________</div>
+        </div>
+        <div class="sig-block">
+          <div class="sig-line"></div>
+          <div class="sig-label">Manager Signature</div>
+          <div class="sig-date-line">Date: __________________</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="print-footer">
+      <p>This is a formal compliance record kept for the purpose of EU Drivers' Hours regulations audit requirements.</p>
+      <p>Report generated by TachographReader (tachographreader.com) on <span id="p-print-timestamp">--</span></p>
+    </div>
+  </div>
+
+  <!-- Toast Notification System -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- JavaScript App Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

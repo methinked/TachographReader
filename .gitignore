@@ -1,0 +1,22 @@
+# OS & editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Environment & logs
+*.log
+.env
+.env.local
+
+# Gemini & Agent Scratch
+.gemini/
+scratch/
+
+# Local sample binary tachograph files (contains personal driver card data)
+Sample/*.DDD
+Sample/*.ddd
+!Sample/.gitkeep
