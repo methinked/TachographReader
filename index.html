@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=1.0.2">
 </head>
 <body>
 
@@ -77,15 +77,17 @@
         <section class="sidebar-section disclaimer-section">
           <h2 class="section-title">Disclaimer</h2>
           <div class="disclaimer-card">
-            <svg class="disclaimer-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            <svg class="disclaimer-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
             </svg>
-            <p><strong>No Warranty & Review Use Only</strong></p>
+            <p><strong>Operational Review Only</strong></p>
             <p class="disclaimer-text">
-              This software is provided "as is", without warranty of any kind, express or implied, including but not limited to fitness for a particular purpose or regulatory compliance.
+              Provided "as is" without warranty of any kind. This tool assists transport managers with preliminary operational reviews.
             </p>
             <p class="disclaimer-text">
-              Designed solely to assist transport managers with preliminary operational reviews. It does not replace certified statutory analysis systems or official DVSA / EU regulatory audits.
+              It does not replace certified statutory analysis systems or official DVSA / EU regulatory audits.
             </p>
           </div>
         </section>
@@ -162,16 +164,6 @@
             </div>
           </div>
 
-          <!-- Welcome Disclaimer Notice -->
-          <div class="welcome-disclaimer">
-            <svg class="welcome-disclaimer-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <div>
-              <strong>Disclaimer:</strong> Provided "as is" without warranty of any kind. This tool assists with preliminary operational reviews and does not substitute for certified statutory tachograph analysis or formal legal advice.
-            </div>
-          </div>
-
           <!-- Welcome Quick Links -->
           <div class="welcome-actions">
             <a href="https://github.com/methinked/TachographReader" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.85rem;">
@@ -181,6 +173,8 @@
               <span>View Project on GitHub</span>
             </a>
           </div>
+
+          <p class="welcome-disclaimer-note">Provided "as is" without warranty for preliminary operational reviews under GPL-3.0. Does not substitute for certified statutory compliance audits.</p>
 
 
         </div>
@@ -482,6 +476,6 @@
   <div class="toast-container" id="toast-container"></div>
 
   <!-- JavaScript App Logic -->
-  <script src="app.js"></script>
+  <script src="app.js?v=1.0.2"></script>
 </body>
 </html>

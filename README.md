@@ -43,13 +43,13 @@ The site will be available locally on `http://localhost:8098` (or reverse-proxie
 
 ### Option B: Standalone / Offline Use
 
-Because TachographReader requires no backend, you can run it completely offline:
-1. Double-click `index.html` in any modern web browser.
-2. No internet access or web server required.
+Because TachographReader runs entirely client-side in the browser:
+1. Open [tachographreader.com](https://tachographreader.com) or run locally in any modern browser.
+2. All processing happens in-memory with zero server-side storage.
 
 ---
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 This tool is provided "as is" without warranty of any kind, express or implied. It is designed to assist transport managers with preliminary operational reviews of digital tachograph card records and is not a substitute for certified statutory tachograph analysis software or official DVSA / EU regulatory compliance checks. Neither the authors nor contributors accept liability for any compliance decisions, penalties, or audit outcomes resulting from the use of this software.
 
