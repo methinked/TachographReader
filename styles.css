@@ -113,6 +113,22 @@ body {
   border-bottom: none;
 }
 
+.sidebar-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.sidebar-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
 .flex-grow {
   flex-grow: 1;
   overflow-y: auto;
@@ -147,6 +163,30 @@ body {
 }
 
 .privacy-notice-text {
+  margin-top: 0.5rem;
+  line-height: 1.4;
+  color: #94a3b8;
+}
+
+/* Legal Disclaimer Card */
+.disclaimer-card {
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1rem;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+}
+
+.disclaimer-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #f59e0b;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.disclaimer-text {
   margin-top: 0.5rem;
   line-height: 1.4;
   color: #94a3b8;
@@ -349,9 +389,33 @@ select.form-control {
 .sidebar-footer {
   padding: 1rem 1.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
   text-align: center;
+  background-color: rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.sidebar-github-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #94a3b8;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.8rem;
+  transition: color 0.15s ease;
+  width: 100%;
+}
+
+.sidebar-github-link:hover {
+  color: #ffffff;
+}
+
+.sidebar-github-link .github-icon {
+  width: 1.15rem;
+  height: 1.15rem;
 }
 
 /* Main Content Area */
@@ -476,6 +540,36 @@ select.form-control {
 .welcome-steps .step p {
   font-size: 0.85rem;
   color: var(--text-muted);
+}
+
+.welcome-disclaimer {
+  margin-top: 1.5rem;
+  padding: 0.85rem 1.25rem;
+  background-color: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  line-height: 1.4;
+}
+
+.welcome-disclaimer-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #f59e0b;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.welcome-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
 }
 
 

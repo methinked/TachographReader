@@ -49,6 +49,12 @@ Because TachographReader requires no backend, you can run it completely offline:
 
 ---
 
+## ⚠️ Disclaimer
+
+This tool is provided "as is" without warranty of any kind, express or implied. It is designed to assist transport managers with preliminary operational reviews of digital tachograph card records and is not a substitute for certified statutory tachograph analysis software or official DVSA / EU regulatory compliance checks. Neither the authors nor contributors accept liability for any compliance decisions, penalties, or audit outcomes resulting from the use of this software.
+
+---
+
 ## 📄 License
 
 This program is free software: you can redistribute it and/or modify it under the terms of the **GNU General Public License as published by the Free Software Foundation, either version 3 of the License**, or (at your option) any later version.
